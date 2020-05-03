@@ -1,0 +1,15 @@
+Show the position of the vehicles. (GPS koordinaten)
+Show the amount of people in the vehicles
+People can enter and leave the vehicles
+Ambulance:    Min amount of personal: 2 (Doctor and driver)
+              Max amount of people:   6
+Polcie:       Min amount of personal: 2 (both policeman)
+              Max amount of personal: 5
+Firefighter:  Min amount of personal: 2
+              Max amount of personal: 9
+Information of avalible vehicles will be send to the server whenever there is a change in the amount.
+Vehicels have to be able to recive information / tasks from the server
+The vehicles confirm the recived information.
+Vehicles confirm the arrival at the place of operation to the server
+Vehicles send information about the people inside to the server when they leave the place of operation
+
