@@ -1,5 +1,12 @@
 Functional:
-ID F    - 
+ID F1    - The vehicles has to show the amount of people inside.
+ID F2    - The vehicles has to show the induvidual people inside.
+ID F3    - People have to be able to enter and leave the vehicles.
+ID F4    - Information of avalible vehicles has to be send to the server whenever there is a change in the amount.
+ID F5    - Vehicels have to be able to recive information / tasks from the server.
+ID F6    - Vehicles have to confirm the received information.
+ID F7    - Vehicles have to confirm the arrival at the place of operation to the server.
+ID F8    - Vehicles have to send information about the people inside to the server when they leave the place of operation.
 
 Non-Functional:
-ID NF   -
+ID NF1   - 
