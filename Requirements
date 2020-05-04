@@ -1,12 +1,21 @@
 Functional:
 ID F1    - The vehicles has to show the amount of people inside.
 ID F2    - The vehicles has to show the induvidual people inside.
-ID F3    - People have to be able to enter and leave the vehicles.
-ID F4    - Information of avalible vehicles has to be send to the server whenever there is a change in the amount.
-ID F5    - Vehicels have to be able to recive information / tasks from the server.
-ID F6    - Vehicles have to confirm the received information.
-ID F7    - Vehicles have to confirm the arrival at the place of operation to the server.
-ID F8    - Vehicles have to send information about the people inside to the server when they leave the place of operation.
+ID F3    - The vehicles has to show its current GPS coordiates.
+ID F4    - People have to be able to enter and leave the vehicles.
+ID F5    - Information of avalible vehicles has to be send to the server whenever there is a change in the amount.
+ID F6    - Vehicels have to be able to recive information / tasks from the server.
+ID F7    - Vehicles have to confirm the received information.
+ID F8    - Vehicles have to confirm the arrival at the place of operation to the server.
+ID F9    - Vehicles have to send information about the people inside to the server when they leave the place of operation.
 
 Non-Functional:
-ID NF1   - 
+ID NF1  - The confirmation of the recived information should not take longer than 5 seconds.
+ID NF2  - The confirmation of the arrival at at the place of operation should not take longer than 5 seconds.
+ID NF3  - The ambulace must have at least 2 people to operate.
+ID NF4  - The ambulane can not hold more than 6 poeple at once.
+ID NF5  - The policecar must have at least 2 people to operate.
+ID NF6  - The policecar can not hold more than 5 poeple at once.
+ID NF7  - The firevehicle must have at least 2 people to operate.
+ID NF8  - The firevehicle can not hold more than 9 poeple at once.
+ID NF9  - The firevehicle should always operate with at least 6 firefighters.
