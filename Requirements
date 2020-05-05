@@ -19,3 +19,4 @@ ID NF6  - The policecar can not hold more than 5 poeple at once.
 ID NF7  - The firevehicle must have at least 2 people to operate.
 ID NF8  - The firevehicle can not hold more than 9 poeple at once.
 ID NF9  - The firevehicle should always operate with at least 6 firefighters.
+ID NF10 - The software has to be implemented with python.
