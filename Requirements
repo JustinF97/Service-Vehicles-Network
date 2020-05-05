@@ -16,7 +16,7 @@ ID NF3  - The ambulace must have at least 2 people to operate.
 ID NF4  - The ambulane can not hold more than 6 poeple at once.
 ID NF5  - The policecar must have at least 2 people to operate.
 ID NF6  - The policecar can not hold more than 5 poeple at once.
-ID NF7  - The firevehicle must have at least 2 people to operate.
-ID NF8  - The firevehicle can not hold more than 9 poeple at once.
-ID NF9  - The firevehicle should always operate with at least 6 firefighters.
+ID NF7  - The firefighting vehicle must have at least 2 people to operate.
+ID NF8  - The firefighting vehicle can not hold more than 9 poeple at once.
+ID NF9  - The firefighting vehicle should always operate with at least 6 firefighters.
 ID NF10 - The software has to be implemented with python.
