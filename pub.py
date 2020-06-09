@@ -97,7 +97,9 @@ def on_message(client, userdata, msg):
         recive(msg.payload)
 
     if(msg.topic.endswith('nova')):
+        print("")
     if(msg.topic.endswith('neva')):
+        print("")
         
     if(msg.topic.endswith('avalible_vehilces')):
         avalible_vehilces(msg.payload)
