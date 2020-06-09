@@ -27,7 +27,7 @@ def on_message(client, userdata, msg):
         confirm(msg.payload, k)
 
     elif(msg.topic.endswith('stop')):
-        
+        print("")
     elif(msg.topic.endswith('avalible vehicles')):
         get_av(vehicle_track)
         
