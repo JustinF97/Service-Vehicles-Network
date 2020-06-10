@@ -1,205 +1,124 @@
 import paho.mqtt.client as mqtt
 import time
 import datetime
-import json
 import random
-
-
-k = [0]
-task = [["-","-","-"],["-","-","-"],["-","-","-"],["-","-","-"],["-","-","-"],["-","-","-"],["-","-","-"]]
-vic1 = []
-vic2 = []
-vic3 = []
-people = ["Luka Blackwell","Zain Walls","Emilia Hayden","Benjamin Bruce","Malcolm Sellers","Henry Blair","Mckenna Neal","Cohen David","DAVE","Perla Dickson","Tyson Harrison","Lorena Lane","Marcel Horn"]
-vehicle_track = [[0],["Policeccar 1","Policecar 2","Policecar 3"], ["-","-","-"]]
-
-
+task = []
+po = []
+k=0
+av = 3
 #Event, dass beim eintreffen einer Nachricht aufgerufen wird
 def on_message(client, userdata, msg):
     msgp = str(msg.payload.decode("utf-8")) #Nachricht Dekodieren
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     print(currentDT.strftime("%Y-%m-%d %H:%M:%S")+" Nachricht erhalten: "+str(msgp))
+    split = str(msg).split(" ")
     
-    if(msg.topic.endswith("task")):
-        savetask(msg.payload)
+    if(msg.topic.endswith == "task"):
+        savetask(split, av)
         
     elif(msg.topic.endswith('confirm')):
-        confirm(msg.payload, k)
+        confirm(split, task)
 
     elif(msg.topic.endswith('stop')):
         print("")
+        
     elif(msg.topic.endswith('avalible vehicles')):
-        get_av(vehicle_track)
+        get_av(av)
         
     elif(msg.topic.endswith('current coordinates')):###doesn't do anything as long as the vehicles return istantly
-        get_coordinates(task)###
+        get_coordinates(task, split, po)###
 
+    else:
+        print("Unknown topic")
 
-
-def savetask(data):
-    global k
-    global task
-    i=0
-    for x in range(0, len(task[0])):
-        if task[0][i] == "-":
-            k = i
-            js = json.loads(data)
-            task[0][i] = js["task"]
-            task[1][i] = js["vamount"]
-            task[2][i] = js["coord1"]
-            task[3][i] = js["coord2"]
-            data = {
-                "task": task[0][i],
-                "coord1": task[2][i],
-                "coord2": task[3][i],
-                "vamount": task[1][i],
-                "topic": "/hshl/polices/police 1"}
-            client.publish("/hshl/polices/police 1", json.dumps(data))
-            break
-        i = i+1
-
-def confirm(data, k):
-    global task
-    global vehicle_track
-    sendvehicle(k)
-    data = {
-        "task":  task[0][k],
-        "vehicles": task[4+k],
-        "info": "Vehicles send to coordinates",
-        "av": (len(vehicle_track[1])-vehicle_track[0][0]),
-        "topic": "/hshl/polices/send"}
-    client.publish("/hshl/polices/send", (json.dumps(data)))
-    data = {
-        "task":  task[0][k],
-        "vehicles": task[4+k],
-        "info": "Vehicles arived",
-        "topic": "/hshl/polices/update"}
-    client.publish("/hshl/polices/update", (json.dumps(data)))
-    returnvehicle(k)#can instead be used when reciving a message
-
-def sendvehicle(k):
-    global task
-    global vehicle_track
-    global people
-    global vic1
-    global vic2
-    global vic3
+def make_police(av):
+    global po
+    names = ["Luka_Blackwell","Zain_Walls","Emilia_Hayden","Benjamin_Bruce","Malcolm_Sellers","Henry_Blair","Mckenna_Neal","Cohen_David","DAVE","Perla_Dickson","Tyson_Harrison","Lorena_Lane","Marcel_Horn"]
+    loc = [51.67, 8.34]
     i = 0
-    if int(vehicle_track[0][0]) == int(len(vehicle_track[1])):#no vehicles 
-        data = {
-        "send":  "No vehicles",
-        "topic": "/hshl/polices/nova"}
-        client.publish("/hshl/polices/nova", json.dumps(data))
-    elif int(task[1][k]) > int(len(vehicle_track[1]))-int(vehicle_track[0][0]):
-        data = {
-        "send":  "Not enough vehicles",
-        "topic": "/hshl/polices/neva"}
-        client.publish("/hshl/polices/neva", json.dumps(data))
-    else:
-        j=0
-        for x in range(0, int(task[1][k])):
-            for x in range(0, len(vehicle_track[1])):
-                if task[4+k][j] == "-":
-                    if  vehicle_track[1][i] != ("-") :
-                        vehicle_track[2][i] = (vehicle_track[1][i])
-                        vehicle_track[1][i] = ("-")
-                        vehicle_track[0][0] = (vehicle_track[0][0] + 1)
-                        task[4+k][j] = (vehicle_track[2][i])
-                        if i == 0:
-                            vic1.append(people[0])
-                            people.remove(vic1[0])
-                            vic1.append(people[0])
-                            people.remove(vic1[1])
-                        if i == 1:
-                            vic2.append(people[0])
-                            people.remove(vic2[0])
-                            vic2.append(people[0])
-                            people.remove(vic2[1])
-                        if i == 2:
-                            vic3.append(people[0])
-                            people.remove(vic3[0])
-                            vic3.append(people[0])
-                            people.remove(vic3[1])
-                i=i+1
-            j=j+1
+    j=0
+    for x in range (0, av):
+        if (len(names) >= 2):
+            n1=random.randint(0, (len(names)-1))
+            n2=random.randint(0, (len(names)-1))
+            po.append(names[n1])
+            names.remove(po[0+j])
+            po.append(names[n2])
+            names.remove(po[1+j])
+            randloc1 = loc[0]+(random.randint(-9, 9)/10)
+            randloc2 = loc[1]+(random.randint(-9, 9)/10)
+            randloc1 = round(randloc1, 2)
+            randloc2 = round(randloc2, 2)
+            po.append("Policecar "+str(i))
+            po.append(str(randloc1)+","+str(randloc2))
+            polices = (str(po[0+j])+" "+str(randloc1)+","+str(randloc2)+" "+"isFree"+" "+"p"+str(i))
+            j= j+4
+            i=i+1
+            print(polices)
+            client.publish("/hshl/polices/coordinates", polices)
+    print(po) 
 
-def returnvehicle(k):
-    global task
-    global vehicle_track
-    global people
-    global vic1
-    global vic2
-    global vic3
-    i=0
-    if vehicle_track[0][0] == 0:
-        print("--")
-        #All vehicles are allready home
+def savetask(split, av):
+    if (av  >= 1):
+        global task
+        global k
+        task.append(split[0])#Task
+        task.append(split[1])#Coordinates
+        task.append(split[2])#ID
+        conf = (str(task[0+k])+" "+str(task[1+k])+" "+str(task[2+k]))
+        k = k+3
+        print(conf)
+        client.publish("/hshl/polices/", conf)
     else:
-        j=0
-        for x in range(0, int(task[1][k])):
-            for x in range(0, len(vehicle_track[2])):
-                if task[4+k][j] == vehicle_track[2][i]:
-                    vehicle_track[1][i] = vehicle_track[2][i]
-                    vehicle_track[2][i] = "-"
-                    vehicle_track[0][0] = (vehicle_track[0][0] - 1)
-                    if i == 0:
-                        people.append(vic1[0])
-                        vic1.remove(vic1[0])
-                        people.append(vic1[0])
-                        vic1.remove(vic1[0])
-                    elif i == 1:
-                        people.append(vic2[0])
-                        vic2.remove(vic2[0])
-                        people.append(vic2[0])
-                        vic2.remove(vic2[0])
-                    elif i == 2:
-                        people.append(vic3[0])
-                        vic3.remove(vic3[0])
-                        people.append(vic3[0])
-                        vic3.remove(vic3[0])
-                i=i+1
-            j=j+1
-        task[0][k] = "-"
-        task[1][k] = "-"
-        task[2][k] = "-"
-        task[3][k] = "-"
-        task[4][k] = "-"
-        get_av(vehicle_track)
+        print("No vehicles")
 
-def get_av(vehicle_track):
-    data = {
-        "avalible_vehilces": (len(vehicle_track[1])-vehicle_track[0][0]),
-        "topic": "/hshl/polices/avalible_vehilces"}
-    client.publish("/hshl/polices/avalible_vehilces", (json.dumps(data)))
+def confirm(split, task):
+    global k
+    global av
+    x = task.index(split[0])
+    send = (task[x+2]+" "+"inUse")
+    client.publish("/hshl/polices/", send)
+    av = av-1
+    get_av(av)
+    send = (task[x+2]+" "+"arrived")
+    client.publish("/hshl/polices/", send)
+    send = (task[x+2]+" "+"returned")
+    client.publish("/hshl/polices/", send)
+    task.remove(task[x])
+    task.remove(task[x])
+    task.remove(task[x])
+    k = k-3
+    av = av+1
+    get_av(av)
+
+def get_av(av):
+    client.publish("/hshl/polices/", av)
+
+def get_coordinates(task, split, po): #Task senden
+    if len(task) >=1 :
+        c = []
+        cv = []
+        cc = []
+        x = task.index(split[0])
+        c = task[1+x].split(",")
+        c[0] = float(c[0])
+        c[1] = float(c[1])
+        cv = po[x+4].split("2")
+        cv[0] = float(cv[0])
+        cv[1] = float(cv[1])
+        cc[0] = (c[0]+cv[0])/2
+        cc[1] = (c[1]+cv[1])/2
+        ccc = (str(cc[0])+","+str(cc[1]))
+        client.publish("/hshl/polices/", ccc)
+    else:
+        a = "No vehilces send"
+        client.publish("/hshl/polices/", a)
         
-
-def get_coordinates(task):
-    i=0
-    for x in range(0, len(task[0])):
-        if task[0][i] != "-":
-                   rand1 = randint(0, 9)/10
-                   rand2 = randint(0, 9)/10
-                   data = {
-                        "task": task[0][i],
-                        "cco": [51+rand1, 8+rand2],
-                        "topic": "/hshl/polices/coordinates"}
-                   client.publish("/hshl/polices/coordinates", (json.dumps(data)))
-        elif (task[0][0] == "-" and task[0][1] == "-" and task[0][2] == "-" ):
-            data = {
-                    "task": "No Tasks",
-                    "cco": [51, 8],
-                    "topic": "/hshl/polices/coordinates"}
-            client.publish("/hshl/polices/coordinates", (json.dumps(data)))
-            break
-        i=i+1
-
 #Event, dass beim Verbindungsaufbau aufgerufen wird
 def on_connect(client, userdata, flags, rc):
-    client.subscribe([('/hshl/polices/task', 2),
-                      ('/hshl/polices/avalible vehicles', 2),
-                      ('/hshl/polices/current coordinates', 2),
-                      ('/hshl/polices/stop', 2),
-                      ('/hshl/polices/confirm', 2)])#Abonnieren des Topics (Hier die jeweiligen Topics einfügen die vorgegeben sind)
+    client.subscribe('/hshl/polices/')#Abonnieren des Topics (Hier die jeweiligen Topics einfügen die vorgegeben sind)
+    print("subsribed")
+    make_police(av)
 
 #Dont change anything from here!!
 BROKER_ADDRESS = "mr2mbqbl71a4vf.messaging.solace.cloud" #Adresse des MQTT Brokers
@@ -211,3 +130,7 @@ client.connect(BROKER_ADDRESS, port = 20614) #Verbindung zum Broker aufbauen
 
 print("Connected to MQTT Broker: " + BROKER_ADDRESS)
 client.loop_forever()#Endlosschleife um neue Nachrichten empfangen zu können
+
+
+
+    
