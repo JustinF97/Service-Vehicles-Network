@@ -16,6 +16,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe('/hshl/polices/vehiclearrived')
     client.subscribe('/hshl/polices/av')
     client.subscribe('/hshl/polices/cc')
+    client.subscribe('/hshl/polices/vehiclereturned')
     print(sendtask)
     topic = "/hshl/polices/p1"
     client.publish(topic, sendtask)
