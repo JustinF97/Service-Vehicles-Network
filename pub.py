@@ -44,7 +44,7 @@ def on_message(client, userdata, message):
     msg = str(message.payload.decode("utf-8")) #Nachricht Dekodieren
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     print(currentDT.strftime("%Y-%m-%d %H:%M:%S")+" Nachricht erhalten: "+str(msg))
-    
+    split = msg.split(" ")
     i=0
     a = message.topic
     a = (a.split("/"))
