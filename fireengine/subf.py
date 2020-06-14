@@ -94,12 +94,9 @@ def savetask(split, b, po):
         client.publish(topic, str(payload))
         topic = ("/hshl/firefighters/sendve")
         print(b)
-        try:
-            y = po.index(str(b))
-            payload = (b+" "+task[x-2]+" "+po[y+1])
-            client.publish(topic, str(payload))
-        except:
-            print("111111")
+        y = po.index(str(b))
+        payload = (b+" "+task[x-2]+" "+po[y+1])
+        client.publish(topic, str(payload))
         print("Send confirmation")
         tr.append(str(b))
         tr.append("True")
