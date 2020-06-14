@@ -48,7 +48,7 @@ def make_police(avv):
     j=0
     
     for x in range (0, avv):
-        if (len(names) >= 2):
+        if (len(names) >= 7):
             for x in range(0, 7):
                 n1=random.randint(0, (len(names)-1))
                 po.append(names[n1])
