@@ -14,6 +14,7 @@ def on_message(client, userdata, message):
     print(currentDT.strftime("%Y-%m-%d %H:%M:%S")+" Nachricht erhalten: "+str(msg))
     split = msg.split(" ")
     i=0
+    global task
     a = message.topic.split("/")
     print(a)
     b = list(a[3])
@@ -65,6 +66,9 @@ def make_police(avv):
             av = av+1            
             print(payload)
             client.publish(topic, payload)
+            a = ("/hshl/polices/p"+str(i))
+            print(a)
+            client.subscribe(str(a))
 
 def savetask(split, b, po):
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
@@ -158,14 +162,6 @@ def get_coordinates(split):
 def on_connect(client, userdata, flags, rc):
     client.subscribe('/hshl/polices/returnvehicle')
     client.subscribe('/hshl/polices/arrived')
-    i = 1
-    global av
-    for x in range(0, avv):
-        a = ("/hshl/polices/p"+str(i))
-        print(a)
-        client.subscribe(str(a))
-        i = i+1
-    print("subsribed")
     make_police(avv)
 
 #Dont change anything from here!!
