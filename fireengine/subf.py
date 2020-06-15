@@ -9,6 +9,7 @@ av=0
 tr = []
 #Event, dass beim eintreffen einer Nachricht aufgerufen wird
 def on_message(client, userdata, message):
+    global task
     msg = str(message.payload.decode("utf-8")) #Nachricht Dekodieren
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     print(currentDT.strftime("%Y-%m-%d %H:%M:%S")+" Nachricht erhalten: "+str(msg))
@@ -64,9 +65,12 @@ def make_police(avv):
             payload = (str(po[0+j])+" "+str(randloc1)+","+str(randloc2)+" "+"True"+" "+"f"+str(i+1))
             j= j+9
             i=i+1
-            av = av+1            
+            av = av+1
             print(payload)
             client.publish(topic, payload)
+            a = ("/hshl/firefighters/f"+str(i))
+            print(a)
+            client.subscribe(str(a))
     
 
 def savetask(split, b, po):
@@ -163,14 +167,6 @@ def get_coordinates(split):
 def on_connect(client, userdata, flags, rc):
     client.subscribe('/hshl/firefighters/returnvehicle')
     client.subscribe('/hshl/firefighters/arrived')
-    i = 1
-    global av
-    for x in range(0, avv):
-        a = ("/hshl/firefighters/f"+str(i))
-        print(a)
-        client.subscribe(str(a))
-        i = i+1
-    print("subsribed")
     make_police(avv)
 
 #Dont change anything from here!!
