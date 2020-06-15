@@ -13,6 +13,7 @@ def on_message(client, userdata, message):
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     print(currentDT.strftime("%Y-%m-%d %H:%M:%S")+" Nachricht erhalten: "+str(msg))
     split = msg.split(" ")
+    global task
     i=0
     a = message.topic.split("/")
     print(a)
@@ -65,6 +66,9 @@ def make_police(avv):
             av = av+1            
             print(payload)
             client.publish(topic, payload)
+            a = ("/hshl/ambulances/a"+str(i))
+            print(a)
+            client.subscribe(str(a))
 
 def savetask(split, b, po):
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
@@ -159,13 +163,6 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe('/hshl/ambulances/returnvehicle')
     client.subscribe('/hshl/ambulances/arrived')
     i = 1
-    global av
-    for x in range(0, avv):
-        a = ("/hshl/ambulances/a"+str(i))
-        print(a)
-        client.subscribe(str(a))
-        i = i+1
-    print("subsribed")
     make_police(avv)
 
 #Dont change anything from here!!
