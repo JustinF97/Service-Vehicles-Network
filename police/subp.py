@@ -27,6 +27,10 @@ def on_message(client, userdata, message):
             try:
                 c = str(b[0]+b[1])
                 c =(task.index(c))
+                print("Vehicle not avalible")
+                topic = ("/hshl/polices/"+b)
+                payload = (b+" "+"False"+" "+currentDT.strftime("%Y-%m-%d %H:%M:%S"))
+                client.publish(topic, str(payload))
             except:
                 try:
                     if(str(split[1]) != "Vehicle_Avalible"):
