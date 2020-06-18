@@ -2,8 +2,10 @@ import paho.mqtt.client as mqtt
 import time
 import datetime
 import random
+import json
 task = []
 po = []
+coor = []
 avv = 3
 av=0
 tr = []
@@ -12,162 +14,222 @@ def on_message(client, userdata, message):
     msg = str(message.payload.decode("utf-8")) #Nachricht Dekodieren
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     print(currentDT.strftime("%Y-%m-%d %H:%M:%S")+" Nachricht erhalten: "+str(msg))
-    split = msg.split(" ")
-    global task
     i=0
+    global task
     a = message.topic.split("/")
     print(a)
     b = list(a[3])
     try:
         if(a[3] == 'returnvehicle'):
-            vehicle_returned(split)
+            split = msg.split(" ")
+            print(split)
+            vehicle_returned(split, po)
         elif(a[3] == 'arrived'):
-                check(split)
+            split = msg.split(" ")
+            print(split)
+            check(split, task, po)
         elif(b[0] == "a"):
             try:
-                c = str(b[0]+b[1])
-                c =(task.index(c))
-                print("Vehicle not avalible")
-                topic = ("/hshl/ambulances/"+b)
-                payload = (b+" "+"False"+" "+currentDT.strftime("%Y-%m-%d %H:%M:%S"))
-                client.publish(topic, str(payload))
+                js = json.loads(message.payload)
+                if (js["self"] == "true"):
+                    g = 1
             except:
-                try:
-                    if(str(split[1]) != "Vehicle_Avalible"):
-                        if(len(split) == 3):
-                            print("Checking...")
-                            savetask(split, b, po)
-                except:
-                    print("")
+                print("Checking...")
+                savetask(message.payload, b, po)
     except:
         print("Unknown topic")
 
-def make_police(avv):
+def make_amb(avv):
     global po
     global av
-    names = ["Luka_Blackwell","Zain_Walls","Emilia_Hayden","Benjamin_Bruce","Malcolm_Sellers","Henry_Blair","Mckenna_Neal","Cohen_David","DAVE","Perla_Dickson","Tyson_Harrison","Lorena_Lane","Marcel_Horn"]
+    global coor
+    names = ["Luka_Blackwell","Zain_Walls","Emilia_Hayden","Benjamin_Bruce","Malcolm_Sellers","Henry_Blair","Mckenna_Neal","Cohen_David","Perla_Dickson","Tyson_Harrison","Lorena_Lane","Marcel_Horn"]
     loc = [51.67, 8.34]
     i = 0
     j=0
     for x in range (0, avv):
         if (len(names) >= 2):
-            n1=random.randint(0, (len(names)-1))
-            po.append(names[n1])
-            names.remove(po[0+j])
-            n2=random.randint(0, (len(names)-1))
-            po.append(names[n2])
-            names.remove(po[1+j])
-            randloc1 = loc[0]+(random.randint(-9, 9)/10)
-            randloc2 = loc[1]+(random.randint(-9, 9)/10)
+            for x in range(0, 2):
+                n1=random.randint(0, (len(names)-1))
+                po.append(names[n1])
+                k = po.index(names[n1])
+                names.remove(po[k])
+            randloc1 = loc[0]+random.randint(-7, 9)+(random.randint(-9, 9)/10)
+            randloc2 = loc[1]+random.randint(-7, 9)+(random.randint(-9, 9)/10)
             randloc1 = round(randloc1, 2)
             randloc2 = round(randloc2, 2)
-            po.append("Ambulance "+str(i))
+            po.append("a"+str(i+1))
             po.append(str(randloc1)+","+str(randloc2))
-            topic="/hshl/ambulances/"
-            payload = (str(po[0+j])+" "+str(randloc1)+","+str(randloc2)+" "+"True"+" "+"a"+str(i+1))
+            loc = [float(randloc1), float(randloc2)]
+            coor.append(loc)
+            coor.append(loc)
+            coor.append("a"+str(i+1))
+            topic="/hshl/polices/"
+            currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
+            data = {
+                "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
+                "driver_name": str(po[0+j]),
+                "location": loc,
+                "isFree" : "True",
+                "id": "a"+str(i+1),
+                "topic": topic}
+            print(str(po[j])+" "+str(po[j+1])+" "+str(po[j+2])+" "+str(po[j+3]))
             j= j+4
             i=i+1
-            av = av+1            
-            print(payload)
-            client.publish(topic, payload)
+            av = av+1     
+            client.publish(topic, json.dumps(data))
             a = ("/hshl/ambulances/a"+str(i))
             print(a)
             client.subscribe(str(a))
+        
 
-def savetask(split, b, po):
+def savetask(data, b, po):
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     global av
     global task
     global tr
+    global coor
     b = str(b[0]+b[1])
-    if(av >= 1):
-        task.append(split[0])#Reason
-        task.append(split[1])#Coordinates
-        task.append(split[2])#Dist
-        task.append(b)#ID
-        x = task.index(b)
-        try:
-            print("Task: ")
-            print(task[x])
-            print(task[x-3])
-            print(task[x-2])
-            print(task[x-1])
-        except:
-            print("Error - No Tasks")
+    try:
+        c = (task.index(b))
+        print("Vehicle not avalible")
         topic = ("/hshl/ambulances/"+b)
-        payload = (b+" "+"True"+" "+currentDT.strftime("%Y-%m-%d %H:%M:%S"))
-        client.publish(topic, str(payload))
-        topic = ("/hshl/ambulances/sendve")
-        payload = (b+" "+task[x-2]+" "+po[x])
-        client.publish(topic, str(payload))
-        print("Send confirmation")
-        tr.append(str(b))
-        tr.append("True")
-        av = av-1
-    else:
-        print("No Vehicles avalible")
-        topic = ("/hshl/ambulances/"+b)
-        payload = (b+" "+"False"+" "+currentDT.strftime("%Y-%m-%d %H:%M:%S"))
-        client.publish(topic, str(payload))
+        data = {
+        "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
+        "id": b,
+        "isFree": "False",
+        "self": "true",
+        "acc" : "False",
+        "location": coor[coor.index(b)-1],
+        "reasons": task[task.index(b)-3],
+        "driver_name": po[po.index(b)-2],
+        "topic": topic}
+        client.publish(topic, json.dumps(data))
+    except:
+        if(av >= 1):
+            js = json.loads(data)
+            task.append(js["reasons"])#Reason
+            a = js["location"]
+            a = str(a[0])+","+str(a[1])
+            task.append(a)#Coordinates
+            task.append("Dist")#Dist
+            task.append(b)#ID
+            x = task.index(b)
+            try:
+                print("Task: ")
+                print(task[x])
+                print(task[x-3])
+                print(task[x-2])
+                print(task[x-1])
+            except:
+                print("Error - No Tasks")
+            topic = ("/hshl/ambulances/"+b)
+            data = {
+                "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
+                "id": b,
+                "isFree": "False",
+                "self": "true",
+                "acc" : "True",
+                "location": coor[coor.index(b)-1],
+                "reasons": task[task.index(b)-3],
+                "driver_name": po[po.index(b)-2],
+                "topic": topic}
+            client.publish(topic, json.dumps(data))
+            topic = ("/hshl/ambulances/sendve")
+            payload = (b+" "+task[x-2]+" "+po[x])
+            client.publish(topic, str(payload))
+            print("Send confirmation")
+            tr.append(str(b))
+            tr.append("True")
+            av = av-1
+        else:
+            print("No Vehicles avalible")
+            topic = ("/hshl/ambulances/"+b)
+            data = {
+                "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
+                "id": b,
+                "isFree": "False",
+                "self": "true",
+                "acc" : "False",
+                "location": coor[coor.index(b)-1],
+                "reasons": task[task.index(b)-3],
+                "driver_name": po[po.index(b)-2],
+                "topic": topic}
+            client.publish(topic, json.dumps(data))
             
-def vehicle_returned(split):
+def vehicle_returned(split, po):
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     global tr
     try:
-        y = tr.index(split[0])
-        if((str(tr[y]) == str(split[0])) and (str(tr[y+1]) == "False")):
+        x = tr.index(split[0])
+        if(str(tr[x+1]) == "False"):
             try:
                 b = split[1]
                 b = list(b.split(",", 1))
                 if(isinstance(float(b[0]), float) == True):
                     if(isinstance(float(b[1]), float) == True):
-                        get_coordinates(split)
                         global task
                         global av
-                        x = task.index(split[0])
-                        topic = ("/hshl/ambulances/"+task[x])
-                        payload = (str(task[x])+" "+"Vehicle_Avalible"+" "+"True"+" "+currentDT.strftime("%Y-%m-%d %H:%M:%S"))
-                        client.publish(topic, str(payload))
+                        global coor
+                        coor[int(coor.index(tr[x]))-1] = [float(b[0]), float(b[1])]
+                        topic = ("/hshl/ambulances/"+str(tr[x]))
+                        data = {
+                            "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
+                            "self": "true",
+                            "location": coor[coor.index(str(tr[x]))-1],
+                            "isFree" : "True",
+                            "reasons": task[task.index(str(tr[x]))-3],
+                            "driver_name": po[po.index(str(tr[x]))-2],
+                            "id": str(tr[x]),
+                            "topic": topic}
+                        client.publish(topic, json.dumps(data))
                         print("Vehicle Returned")
-                        print(task[x])
-                        task.remove(task[x-3])
-                        task.remove(task[x-3])
-                        task.remove(task[x-3])
-                        task.remove(task[x-3])
-                        tr.remove(tr[y])
-                        tr.remove(tr[y])
+                        y = task.index(tr[x])
+                        task.remove(task[y-3])
+                        task.remove(task[y-3])
+                        task.remove(task[y-3])
+                        task.remove(task[y-3])
+                        tr.remove(tr[x])
+                        tr.remove(tr[x])
                         av = av+1
             except:
                 ("Wrong Data")
     except:
         print("Error -")
 
-def check(split):
+def check(split, task, po):
+    currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     try:
         b = split[1]
         b = list(b.split(",", 1))
         if(isinstance(float(b[0]), float) == True):
             if(isinstance(float(b[1]), float) == True):
                 global tr
+                global coor
                 x = tr.index(str(split[0]))
-                if((str(tr[x]) == str(split[0])) and (str(tr[x+1]) == "True")):
+                if(str(tr[x+1]) == "True"):
+                    coor[int(coor.index(tr[x]))-1] = [float(b[0]), float(b[1])]
+                    topic = ("/hshl/ambulances/"+str(tr[x]))
+                    data = {
+                        "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
+                        "location": coor[coor.index(str(tr[x]))-1],
+                        "id": str(tr[x]),
+                        "self": "true",
+                        "isFree": "False",
+                        "reasons": task[task.index(str(tr[x]))],
+                        "driver_name": po[po.index(str(tr[x]))-2],
+                        "topic": topic}
+                    client.publish(topic, json.dumps(data))
                     tr[x+1] = "False"
-                    get_coordinates(split)
     except:
         print("Wrong Data")
-
-def get_coordinates(split):
-    topic = ("/hshl/ambulances/"+split[0])
-    payload = (split[1])
-    client.publish(topic, str(payload))
         
         
 #Event, dass beim Verbindungsaufbau aufgerufen wird
 def on_connect(client, userdata, flags, rc):
     client.subscribe('/hshl/ambulances/returnvehicle')
     client.subscribe('/hshl/ambulances/arrived')
-    i = 1
-    make_police(avv)
+    make_amb(avv)
 
 #Dont change anything from here!!
 BROKER_ADDRESS = "mr2mbqbl71a4vf.messaging.solace.cloud" #Adresse des MQTT Brokers
