@@ -64,7 +64,7 @@ def make_amb(avv):
             coor.append(loc)
             coor.append(loc)
             coor.append("a"+str(i+1))
-            topic="/hshl/polices/"
+            topic="/hshl/ambulances/"
             currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
             data = {
                 "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
