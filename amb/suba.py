@@ -133,6 +133,7 @@ def savetask(data, b, po):
                 "location": coor[coor.index(b)-1],
                 "reasons": task[task.index(b)-3],
                 "driver_name": po[po.index(b)-2],
+                "av": av,
                 "topic": topic}
             client.publish(topic, json.dumps(data))
             topic = ("/hshl/ambulances/sendve")
@@ -180,6 +181,7 @@ def vehicle_returned(split, po):
                             "isFree" : "True",
                             "reasons": task[task.index(str(tr[x]))-3],
                             "driver_name": po[po.index(str(tr[x]))-2],
+                            "av": av,
                             "id": str(tr[x]),
                             "topic": topic}
                         client.publish(topic, json.dumps(data))
