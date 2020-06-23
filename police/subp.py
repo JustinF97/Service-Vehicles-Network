@@ -70,7 +70,7 @@ def make_police(avv):
                 "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
                 "driver_name": str(po[0+j]),
                 "location": loc,
-                "isFree" : "True",
+                "isFree" : True,
                 "id": "p"+str(i+1),
                 "topic": topic}
             print(str(po[j])+" "+str(po[j+1])+" "+str(po[j+2])+" "+str(po[j+3]))
@@ -97,7 +97,7 @@ def savetask(data, b, po):
         data = {
         "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
         "id": b,
-        "isFree": "False",
+        "isFree": False,
         "self": "true",
         "acc" : "False",
         "location": coor[coor.index(b)-1],
@@ -127,7 +127,7 @@ def savetask(data, b, po):
             data = {
                 "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
                 "id": b,
-                "isFree": "False",
+                "isFree": False,
                 "self": "true",
                 "acc" : "True",
                 "location": coor[coor.index(b)-1],
@@ -149,7 +149,7 @@ def savetask(data, b, po):
             data = {
                 "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
                 "id": b,
-                "isFree": "False",
+                "isFree": False,
                 "self": "true",
                 "acc" : "False",
                 "location": coor[coor.index(b)-1],
@@ -178,7 +178,7 @@ def vehicle_returned(split, po):
                             "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
                             "self": "true",
                             "location": coor[coor.index(str(tr[x]))-1],
-                            "isFree" : "True",
+                            "isFree" : True,
                             "reasons": task[task.index(str(tr[x]))-3],
                             "driver_name": po[po.index(str(tr[x]))-2],
                             "av": av,
@@ -217,7 +217,7 @@ def check(split, task, po):
                         "location": coor[coor.index(str(tr[x]))-1],
                         "id": str(tr[x]),
                         "self": "true",
-                        "isFree": "False",
+                        "isFree": False,
                         "reasons": task[task.index(str(tr[x]))],
                         "driver_name": po[po.index(str(tr[x]))-2],
                         "topic": topic}
