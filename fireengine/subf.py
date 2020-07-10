@@ -14,8 +14,6 @@ def on_message(client, userdata, message):
     msg = str(message.payload.decode("utf-8")) #Nachricht Dekodieren
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
     print(currentDT.strftime("%Y-%m-%d %H:%M:%S")+" Nachricht erhalten: "+str(msg))
-    i=0
-    global task
     a = message.topic.split("/")
     print(a)
     b = list(a[3])
@@ -62,16 +60,16 @@ def make_police(avv):
             randloc2 = round(randloc2, 2)
             po.append("f"+str(i+1))
             po.append(str(randloc1)+","+str(randloc2))
-            loc = [float(randloc1), float(randloc2)]
-            coor.append(loc)
-            coor.append(loc)
+            loc1 = [float(randloc1), float(randloc2)]
+            coor.append("["+str(randloc1)+", "+ str(randloc2)+"]")
+            coor.append(loc1)
             coor.append("f"+str(i+1))
             topic="/hshl/firefighters/"
             currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
             data = {
                 "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
                 "driver_name": str(po[0+j]),
-                "location": loc,
+                "location": ("["+str(randloc1)+", "+ str(randloc2)+"]"),
                 "isFree" : True,
                 "id": "f"+str(i+1),
                 "topic": topic}
@@ -94,7 +92,7 @@ def savetask(data, b, po):
     b = str(b[0]+b[1])
     try:
         c = (task.index(b))
-        print("Vehicle not avalible")
+        print("Vehicle not available")
         topic = ("/hshl/firefighters/"+b)
         data = {
         "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
@@ -102,64 +100,41 @@ def savetask(data, b, po):
         "isFree": False,
         "self": "true",
         "acc" : "False",
-        "location": coor[coor.index(b)-1],
+        "location": coor[coor.index(b)-2],
         "reasons": task[task.index(b)-3],
         "driver_name": po[po.index(b)-2],
         "topic": topic}
         client.publish(topic, json.dumps(data))
     except:
-        if(av >= 1):
-            js = json.loads(data)
-            task.append(js["reasons"])#Reason
-            a = js["location"]
-            a = str(a[0])+","+str(a[1])
-            task.append(a)#Coordinates
-            task.append("Dist")#Dist
-            task.append(b)#ID
-            x = task.index(b)
-            try:
-                print("Task: ")
-                print(task[x])
-                print(task[x-3])
-                print(task[x-2])
-                print(task[x-1])
-            except:
-                print("Error - No Tasks")
-            topic = ("/hshl/firefighters/"+b)
-            data = {
-                "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
-                "id": b,
-                "isFree": False,
-                "self": "true",
-                "acc" : "True",
-                "location": coor[coor.index(b)-1],
-                "reasons": task[task.index(b)-3],
-                "driver_name": po[po.index(b)-2],
-                "av": av,
-                "topic": topic}
-            client.publish(topic, json.dumps(data))
-            topic = ("/hshl/firefighters/sendve")
-            y = po.index(str(b))
-            payload = (b+" "+task[x-2]+" "+po[y+1])
-            client.publish(topic, str(payload))
-            print("Send confirmation")
-            tr.append(str(b))
-            tr.append("True")
-            av = av-1
-        else:
-            print("No Vehicles avalible")
-            topic = ("/hshl/firefighters/"+b)
-            data = {
-                "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
-                "id": b,
-                "isFree": False,
-                "self": "true",
-                "acc" : "False",
-                "location": coor[coor.index(b)-1],
-                "reasons": task[task.index(b)-3],
-                "driver_name": po[po.index(b)-2],
-                "topic": topic}
-            client.publish(topic, json.dumps(data))
+        js = json.loads(data)
+        task.append(js["reasons"])#Reason
+        a = js["location"]
+        a = str(a[0])+","+str(a[1])
+        task.append(a)#Coordinates
+        task.append("Dist")#Dist
+        task.append(b)#ID
+        x = task.index(b)
+        topic = ("/hshl/firefighters/"+b)
+        data = {
+            "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
+            "id": b,
+            "isFree": False,
+            "self": "true",
+            "acc" : "True",
+            "location": coor[coor.index(b)-2],
+            "reasons": task[task.index(b)-3],
+            "driver_name": po[po.index(b)-2],
+            "av": av,
+            "topic": topic}
+        client.publish(topic, json.dumps(data))
+        topic = ("/hshl/firefighters/sendve")
+        y = po.index(str(b))
+        payload = (b+" "+task[x-2]+" "+po[y+1])
+        client.publish(topic, str(payload))
+        print("Send confirmation")
+        tr.append(str(b))
+        tr.append("True")
+        av = av-1
             
 def vehicle_returned(split, po):
     currentDT = datetime.datetime.now() #Aktuelle Uhrzeit
@@ -175,12 +150,12 @@ def vehicle_returned(split, po):
                         global task
                         global av
                         global coor
-                        coor[int(coor.index(tr[x]))-1] = [float(b[0]), float(b[1])]
+                        f = "["+b[0]+", "+b[1]+"]"
                         topic = ("/hshl/firefighters/"+str(tr[x]))
                         data = {
                             "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
                             "self": "true",
-                            "location": coor[coor.index(str(tr[x]))-1],
+                            "location": f,
                             "isFree" : True,
                             "reasons": task[task.index(str(tr[x]))-3],
                             "driver_name": po[po.index(str(tr[x]))-2],
@@ -188,6 +163,7 @@ def vehicle_returned(split, po):
                             "id": str(tr[x]),
                             "topic": topic}
                         client.publish(topic, json.dumps(data))
+                        coor[int(coor.index(tr[x]))-1] = [float(b[0]), float(b[1])]
                         print("Vehicle Returned")
                         y = task.index(tr[x])
                         task.remove(task[y-3])
@@ -213,11 +189,11 @@ def check(split, task, po):
                 global coor
                 x = tr.index(str(split[0]))
                 if(str(tr[x+1]) == "True"):
-                    coor[int(coor.index(tr[x]))-1] = [float(b[0]), float(b[1])]
+                    f = "["+b[0]+", "+b[1]+"]"
                     topic = ("/hshl/firefighters/"+str(tr[x]))
                     data = {
                         "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
-                        "location": coor[coor.index(str(tr[x]))-1],
+                        "location": f,
                         "id": str(tr[x]),
                         "self": "true",
                         "isFree": False,
@@ -225,6 +201,7 @@ def check(split, task, po):
                         "driver_name": po[po.index(str(tr[x]))-2],
                         "topic": topic}
                     client.publish(topic, json.dumps(data))
+                    coor[int(coor.index(tr[x]))-1] = [float(b[0]), float(b[1])]
                     tr[x+1] = "False"
     except:
         print("Wrong Data")
