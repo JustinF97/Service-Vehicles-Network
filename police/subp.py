@@ -61,7 +61,8 @@ def make_police(avv):
             po.append("p"+str(i+1))
             po.append(str(randloc1)+","+str(randloc2))
             loc1 = [float(randloc1), float(randloc2)]
-            coor.append("["+str(randloc1)+", "+ str(randloc2)+"]")
+            test = [randloc1, randloc2]
+            coor.append(test)
             coor.append(loc1)
             coor.append("p"+str(i+1))
             topic="/hshl/polices/"
@@ -69,8 +70,8 @@ def make_police(avv):
             data = {
                 "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
                 "driver_name": str(po[0+j]),
-                "location": ("["+str(randloc1)+", "+ str(randloc2)+"]"),
-                "isFree" : True,
+                "location": test,
+                "isFree": True,
                 "id": "p"+str(i+1),
                 "topic": topic}
             print(str(po[j])+" "+str(po[j+1])+" "+str(po[j+2])+" "+str(po[j+3]))
@@ -149,7 +150,7 @@ def vehicle_returned(split, po):
                         global task
                         global av
                         global coor
-                        f = "["+b[0]+", "+b[1]+"]"
+                        f = [b[0], b[1]]
                         topic = ("/hshl/polices/"+str(tr[x]))
                         data = {
                             "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
@@ -188,7 +189,7 @@ def check(split, task, po):
                 global coor
                 x = tr.index(str(split[0]))
                 if(str(tr[x+1]) == "True"):
-                    f = "["+b[0]+", "+b[1]+"]"
+                    f = [b[0], b[1]]
                     topic = ("/hshl/polices/"+str(tr[x]))
                     data = {
                         "time": currentDT.strftime("%Y-%m-%d %H:%M:%S"),
